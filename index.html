@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Star Catcher Pro | Developed by shiranh</title>
+    <meta
+      name="description"
+      content="Star Catcher Pro is a polished arcade browser game developed by shiranh. Catch stars, avoid rocks, and chase your best score."
+    >
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="game-shell">
+      <nav class="site-nav" aria-label="Game navigation">
+        <a class="logo" href="#game">Star Catcher Pro</a>
+        <a class="nav-link" href="#about">About</a>
+      </nav>
+
+      <header class="brand-bar">
+        <div>
+          <p class="eyebrow">Arcade Edition</p>
+          <h1>Star Catcher Pro</h1>
+          <p class="intro">A fast, clean browser arcade game built for instant play on desktop and mobile.</p>
+        </div>
+        <div class="creator-mark" aria-label="Developed by shiranh">
+          <span>SHIRANH TM</span>
+          <small>Developed by shiranh</small>
+        </div>
+      </header>
+
+      <section class="hud" aria-label="Game stats">
+        <div>
+          <span class="label">Score</span>
+          <strong id="score">0</strong>
+        </div>
+        <div>
+          <span class="label">Best</span>
+          <strong id="best">0</strong>
+        </div>
+        <div>
+          <span class="label">Lives</span>
+          <strong id="lives">3</strong>
+        </div>
+      </section>
+
+      <canvas id="game" width="900" height="540" aria-label="Star Catcher game"></canvas>
+
+      <section class="controls">
+        <button id="startButton" type="button">Start Game</button>
+        <p>Move with arrow keys or A/D. On touch screens, drag the catcher.</p>
+      </section>
+
+      <section id="about" class="info-grid" aria-label="Game details">
+        <article>
+          <span class="card-kicker">Goal</span>
+          <h2>Catch the stars</h2>
+          <p>Collect falling stars to raise your score. Every miss costs a life, so stay sharp.</p>
+        </article>
+        <article>
+          <span class="card-kicker">Danger</span>
+          <h2>Dodge the rocks</h2>
+          <p>Rocks get more common as the score grows. One hit removes a life.</p>
+        </article>
+        <article>
+          <span class="card-kicker">Creator</span>
+          <h2>Developed by shiranh</h2>
+          <p>Original game concept, interface, and creator mark prepared for GitHub Pages publishing.</p>
+        </article>
+      </section>
+
+      <footer class="signature">
+        Star Catcher Pro | Developed by shiranh | GitHub Pages ready
+      </footer>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
