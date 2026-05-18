@@ -109,7 +109,7 @@ h1 {
 
 .game-library {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   margin-bottom: 12px;
 }
@@ -172,6 +172,44 @@ h1 {
   border-radius: 8px;
   background: rgba(5, 11, 20, 0.78);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.difficulty-panel {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 207, 74, 0.24);
+  border-radius: 8px;
+  background: rgba(5, 11, 20, 0.72);
+}
+
+.difficulty-panel.visible {
+  display: flex;
+}
+
+.difficulty-panel label {
+  color: #ffcf4a;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.difficulty-panel select {
+  min-width: 138px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 9px 11px;
+  background: #071426;
+  color: #f7fbff;
+  font-weight: 800;
+}
+
+.difficulty-panel span {
+  color: #b7c5d8;
+  font-size: 0.92rem;
 }
 
 .label {
@@ -270,6 +308,11 @@ h2 {
   }
 
   .controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .difficulty-panel {
     align-items: stretch;
     flex-direction: column;
   }
