@@ -60,36 +60,11 @@ const sudokuSolution = [
 ];
 
 const sudokuDifficulties = {
-  easy: {
-    label: "Easy",
-    clues: 46,
-    lives: 5,
-    hint: "Easy starts with more numbers and 5 lives.",
-  },
-  normal: {
-    label: "Normal",
-    clues: 38,
-    lives: 4,
-    hint: "Normal has a balanced number of clues.",
-  },
-  hard: {
-    label: "Hard",
-    clues: 31,
-    lives: 3,
-    hint: "Hard removes more clues and gives 3 lives.",
-  },
-  expert: {
-    label: "Expert",
-    clues: 26,
-    lives: 3,
-    hint: "Expert is sparse and needs careful logic.",
-  },
-  master: {
-    label: "Master",
-    clues: 22,
-    lives: 2,
-    hint: "Master gives very few clues and only 2 lives.",
-  },
+  easy: { label: "Easy", clues: 46, lives: 5, hint: "Easy starts with more numbers and 5 lives." },
+  normal: { label: "Normal", clues: 38, lives: 4, hint: "Normal has a balanced number of clues." },
+  hard: { label: "Hard", clues: 31, lives: 3, hint: "Hard removes more clues and gives 3 lives." },
+  expert: { label: "Expert", clues: 26, lives: 3, hint: "Expert is sparse and needs careful logic." },
+  master: { label: "Master", clues: 22, lives: 2, hint: "Master gives very few clues and only 2 lives." },
 };
 
 let sudokuPuzzle = [];
@@ -104,7 +79,7 @@ const state = {
   drops: [],
   target: null,
   sudokuBoard: [],
-  sudokuSelected: { row: 0, col: 2 },
+  sudokuSelected: { row: 0, col: 0 },
   sudokuComplete: false,
   sudokuDifficulty: "easy",
   lastSpawn: 0,
@@ -127,6 +102,18 @@ function loadBest() {
   bestEl.textContent = state.best;
 }
 
+function saveBest() {
+  if (state.score <= state.best) return;
+  state.best = state.score;
+  localStorage.setItem(activeGame().bestKey, String(state.best));
+}
+
+function syncHud() {
+  scoreEl.textContent = state.score;
+  bestEl.textContent = state.best;
+  livesEl.textContent = state.lives;
+}
+
 function selectGame(mode) {
   state.mode = mode;
   state.running = false;
@@ -135,8 +122,8 @@ function selectGame(mode) {
   state.drops = [];
   state.target = null;
   state.sudokuComplete = false;
-  if (mode === "sudoku") resetSudoku();
   sudokuDifficultyPanel.classList.toggle("visible", mode === "sudoku");
+  if (mode === "sudoku") resetSudoku();
   startButton.textContent = "Start Game";
   gameHelp.textContent = activeGame().help;
   gameCards.forEach((card) => card.classList.toggle("active", card.dataset.game === mode));
@@ -148,7 +135,7 @@ function selectGame(mode) {
 function resetGame() {
   state.running = true;
   state.score = 0;
-  state.lives = 3;
+  state.lives = state.mode === "sudoku" ? sudokuDifficulties[state.sudokuDifficulty].lives : 3;
   state.drops = [];
   state.target = null;
   state.sudokuComplete = false;
@@ -156,35 +143,10 @@ function resetGame() {
   state.lastFrame = performance.now();
   state.player.x = canvas.width / 2;
   startButton.textContent = "Restart";
-  syncHud();
   if (state.mode === "targets") spawnTarget(performance.now());
-  if (state.mode === "sudoku") {
-    state.lives = sudokuDifficulties[state.sudokuDifficulty].lives;
-    resetSudoku();
-    syncHud();
-  }
+  if (state.mode === "sudoku") resetSudoku();
+  syncHud();
   requestAnimationFrame(loop);
-}
-
-function syncHud() {
-  scoreEl.textContent = state.score;
-  bestEl.textContent = state.best;
-  livesEl.textContent = state.lives;
-}
-
-function saveBest() {
-  if (state.score <= state.best) return;
-  state.best = state.score;
-  localStorage.setItem(activeGame().bestKey, String(state.best));
-}
-
-function resetSudoku() {
-  const level = sudokuDifficulties[state.sudokuDifficulty];
-  sudokuPuzzle = makeSudokuPuzzle(level.clues);
-  state.sudokuBoard = sudokuPuzzle.map((row) => [...row]);
-  state.sudokuSelected = findFirstOpenSudokuCell();
-  state.sudokuComplete = false;
-  difficultyHint.textContent = level.hint;
 }
 
 function makeSudokuPuzzle(clues) {
@@ -214,11 +176,19 @@ function findFirstOpenSudokuCell() {
   return { row: 0, col: 0 };
 }
 
+function resetSudoku() {
+  const level = sudokuDifficulties[state.sudokuDifficulty];
+  sudokuPuzzle = makeSudokuPuzzle(level.clues);
+  state.sudokuBoard = sudokuPuzzle.map((row) => [...row]);
+  state.sudokuSelected = findFirstOpenSudokuCell();
+  state.sudokuComplete = false;
+  difficultyHint.textContent = level.hint;
+}
+
 function spawnDrop(now) {
   const game = activeGame();
   const spawnRate = Math.max(320, game.spawnBase - state.score * 10);
   if (now - state.lastSpawn < spawnRate) return;
-
   const isBad = Math.random() < Math.min(0.36, 0.14 + state.score / 260);
   state.drops.push({
     x: 30 + Math.random() * (canvas.width - 60),
@@ -232,11 +202,10 @@ function spawnDrop(now) {
 }
 
 function spawnTarget(now) {
-  const radius = Math.max(22, 42 - state.score * 0.35);
   state.target = {
     x: 70 + Math.random() * (canvas.width - 140),
     y: 82 + Math.random() * (canvas.height - 165),
-    radius,
+    radius: Math.max(22, 42 - state.score * 0.35),
     born: now,
     ttl: Math.max(850, 1750 - state.score * 18),
   };
@@ -246,7 +215,6 @@ function movePlayer(delta) {
   let direction = 0;
   if (state.keys.has("ArrowLeft") || state.keys.has("a")) direction -= 1;
   if (state.keys.has("ArrowRight") || state.keys.has("d")) direction += 1;
-
   state.player.x += direction * state.player.speed * delta;
   const half = state.player.width / 2;
   state.player.x = Math.max(half, Math.min(canvas.width - half, state.player.x));
@@ -264,7 +232,6 @@ function updateDrops(delta) {
   state.drops = state.drops.filter((drop) => {
     drop.y += drop.speed * delta;
     drop.spin += delta * 4;
-
     const caught =
       drop.x + drop.radius > catcher.left &&
       drop.x - drop.radius < catcher.right &&
@@ -275,42 +242,33 @@ function updateDrops(delta) {
       state.score += 1;
       return false;
     }
-
     if (caught && drop.kind === game.bad) {
       state.lives -= 1;
       return false;
     }
-
     if (drop.y - drop.radius > canvas.height) {
       if (drop.kind === game.good) state.lives -= 1;
       return false;
     }
-
     return true;
   });
 }
 
-function updateTargetGame(now) {
-  if (!state.target) spawnTarget(now);
-  if (state.target && now - state.target.born > state.target.ttl) {
-    state.lives -= 1;
-    spawnTarget(now);
-  }
-}
-
 function updateGame(delta, now) {
-  if (state.mode === "sudoku") {
-    if (state.sudokuComplete) state.running = false;
-  } else if (state.mode === "targets") {
-    updateTargetGame(now);
-  } else {
+  if (state.mode === "targets") {
+    if (!state.target) spawnTarget(now);
+    if (state.target && now - state.target.born > state.target.ttl) {
+      state.lives -= 1;
+      spawnTarget(now);
+    }
+  } else if (state.mode !== "sudoku") {
     spawnDrop(now);
     movePlayer(delta);
     updateDrops(delta);
   }
 
   saveBest();
-  if (state.lives <= 0) {
+  if (state.lives <= 0 || state.sudokuComplete) {
     state.running = false;
     startButton.textContent = "Play Again";
   }
@@ -318,20 +276,13 @@ function updateGame(delta, now) {
 }
 
 function drawBackground() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
   gradient.addColorStop(0, "#071426");
   gradient.addColorStop(1, "#030914");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
-  for (let i = 0; i < 70; i += 1) {
-    const x = (i * 137) % canvas.width;
-    const y = (i * 89) % canvas.height;
-    ctx.fillRect(x, y, 2, 2);
-  }
-
+  for (let i = 0; i < 70; i += 1) ctx.fillRect((i * 137) % canvas.width, (i * 89) % canvas.height, 2, 2);
   ctx.textAlign = "right";
   ctx.fillStyle = "rgba(255, 207, 74, 0.22)";
   ctx.font = "800 18px system-ui, sans-serif";
@@ -347,7 +298,6 @@ function drawPlayer() {
   ctx.beginPath();
   ctx.roundRect(x - width / 2, y - height / 2, width, height, 12);
   ctx.fill();
-
   ctx.fillStyle = "#d9f7ff";
   ctx.beginPath();
   ctx.arc(x, y - 8, 10, 0, Math.PI * 2);
@@ -410,29 +360,43 @@ function drawDrops() {
   });
 }
 
+function drawTarget(now) {
+  if (!state.target) return;
+  const progress = Math.max(0, 1 - (now - state.target.born) / state.target.ttl);
+  ctx.strokeStyle = `rgba(255, 207, 74, ${0.25 + progress * 0.45})`;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.arc(state.target.x, state.target.y, state.target.radius + (1 - progress) * 28, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = "#57d7ff";
+  ctx.beginPath();
+  ctx.arc(state.target.x, state.target.y, state.target.radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(state.target.x, state.target.y, state.target.radius * 0.42, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 function drawSudokuBoard() {
   if (!state.sudokuBoard.length) resetSudoku();
   const size = Math.min(canvas.height - 76, canvas.width - 270);
   const cell = size / 9;
   const startX = 44;
   const startY = 40;
-
   ctx.fillStyle = "rgba(247, 251, 255, 0.95)";
   ctx.fillRect(startX, startY, size, size);
-
-  const selected = state.sudokuSelected;
   ctx.fillStyle = "rgba(87, 215, 255, 0.24)";
-  ctx.fillRect(startX + selected.col * cell, startY + selected.row * cell, cell, cell);
+  ctx.fillRect(startX + state.sudokuSelected.col * cell, startY + state.sudokuSelected.row * cell, cell, cell);
 
   for (let row = 0; row < 9; row += 1) {
     for (let col = 0; col < 9; col += 1) {
       const value = state.sudokuBoard[row][col];
-      const fixed = sudokuPuzzle[row][col] !== 0;
       if (!value) continue;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = fixed ? "#071426" : "#0c86c8";
-      ctx.font = `${fixed ? 700 : 800} ${Math.floor(cell * 0.52)}px system-ui, sans-serif`;
+      ctx.fillStyle = sudokuPuzzle[row][col] ? "#071426" : "#0c86c8";
+      ctx.font = `${sudokuPuzzle[row][col] ? 700 : 800} ${Math.floor(cell * 0.52)}px system-ui, sans-serif`;
       ctx.fillText(String(value), startX + col * cell + cell / 2, startY + row * cell + cell / 2);
     }
   }
@@ -461,32 +425,9 @@ function drawSudokuBoard() {
   ctx.fillText("Press 1 to 9 to solve.", startX + size + 34, startY + 112);
   ctx.fillText("Wrong number costs a life.", startX + size + 34, startY + 140);
   ctx.fillText(`Level: ${sudokuDifficulties[state.sudokuDifficulty].label}`, startX + size + 34, startY + 168);
-
   ctx.fillStyle = "#ffcf4a";
   ctx.font = "900 18px system-ui, sans-serif";
   ctx.fillText("SHIRANH TM", startX + size + 34, startY + 230);
-}
-
-function drawTarget(now) {
-  if (!state.target) return;
-  const progress = Math.max(0, 1 - (now - state.target.born) / state.target.ttl);
-  const pulse = state.target.radius + (1 - progress) * 28;
-
-  ctx.strokeStyle = `rgba(255, 207, 74, ${0.25 + progress * 0.45})`;
-  ctx.lineWidth = 5;
-  ctx.beginPath();
-  ctx.arc(state.target.x, state.target.y, pulse, 0, Math.PI * 2);
-  ctx.stroke();
-
-  ctx.fillStyle = "#57d7ff";
-  ctx.beginPath();
-  ctx.arc(state.target.x, state.target.y, state.target.radius, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#ffffff";
-  ctx.beginPath();
-  ctx.arc(state.target.x, state.target.y, state.target.radius * 0.42, 0, Math.PI * 2);
-  ctx.fill();
 }
 
 function drawMessage(title, detail) {
@@ -503,11 +444,9 @@ function drawMessage(title, detail) {
 
 function render(now = performance.now()) {
   drawBackground();
-  if (state.mode === "sudoku") {
-    drawSudokuBoard();
-  } else if (state.mode === "targets") {
-    drawTarget(now);
-  } else {
+  if (state.mode === "sudoku") drawSudokuBoard();
+  else if (state.mode === "targets") drawTarget(now);
+  else {
     drawDrops();
     drawPlayer();
   }
@@ -524,57 +463,12 @@ function loop(now) {
     render(now);
     return;
   }
-
   const delta = Math.min(0.032, (now - state.lastFrame) / 1000);
   state.lastFrame = now;
   updateGame(delta, now);
   render(now);
   requestAnimationFrame(loop);
 }
-
-window.addEventListener("keydown", (event) => {
-  if (state.running && state.mode === "sudoku" && /^[1-9]$/.test(event.key)) {
-    enterSudokuNumber(Number(event.key));
-    return;
-  }
-
-  if (state.running && state.mode === "sudoku" && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
-    moveSudokuSelection(event.key);
-    return;
-  }
-
-  state.keys.add(event.key);
-});
-
-window.addEventListener("keyup", (event) => {
-  state.keys.delete(event.key);
-});
-
-canvas.addEventListener("pointermove", (event) => {
-  if (!state.running || state.mode === "targets") return;
-  const rect = canvas.getBoundingClientRect();
-  const scale = canvas.width / rect.width;
-  state.player.x = (event.clientX - rect.left) * scale;
-});
-
-canvas.addEventListener("pointerdown", (event) => {
-  if (state.running && state.mode === "sudoku") {
-    selectSudokuCell(event);
-    return;
-  }
-
-  if (!state.running || state.mode !== "targets" || !state.target) return;
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  const x = (event.clientX - rect.left) * scaleX;
-  const y = (event.clientY - rect.top) * scaleY;
-  const distance = Math.hypot(x - state.target.x, y - state.target.y);
-  if (distance <= state.target.radius) {
-    state.score += 1;
-    spawnTarget(performance.now());
-  }
-});
 
 function moveSudokuSelection(key) {
   const delta = {
@@ -594,12 +488,8 @@ function selectSudokuCell(event) {
   const scaleY = canvas.height / rect.height;
   const size = Math.min(canvas.height - 76, canvas.width - 270);
   const cell = size / 9;
-  const x = (event.clientX - rect.left) * scaleX;
-  const y = (event.clientY - rect.top) * scaleY;
-  const startX = 44;
-  const startY = 40;
-  const col = Math.floor((x - startX) / cell);
-  const row = Math.floor((y - startY) / cell);
+  const col = Math.floor(((event.clientX - rect.left) * scaleX - 44) / cell);
+  const row = Math.floor(((event.clientY - rect.top) * scaleY - 40) / cell);
   if (row < 0 || row > 8 || col < 0 || col > 8) return;
   state.sudokuSelected = { row, col };
   render();
@@ -608,7 +498,6 @@ function selectSudokuCell(event) {
 function enterSudokuNumber(number) {
   const { row, col } = state.sudokuSelected;
   if (sudokuPuzzle[row][col] !== 0) return;
-
   if (sudokuSolution[row][col] === number) {
     state.sudokuBoard[row][col] = number;
     state.score += 1;
@@ -616,28 +505,57 @@ function enterSudokuNumber(number) {
     state.lives -= 1;
   }
 
-  const filled = state.sudokuBoard.every((line) => line.every((cell) => cell !== 0));
-  if (filled) {
+  if (state.sudokuBoard.every((line) => line.every((cell) => cell !== 0))) {
     state.sudokuComplete = true;
     state.score += 20;
-    saveBest();
+  }
+  if (state.sudokuComplete || state.lives <= 0) {
     state.running = false;
     startButton.textContent = "Play Again";
   }
-
-  if (state.lives <= 0) {
-    state.running = false;
-    startButton.textContent = "Play Again";
-  }
-
   saveBest();
   syncHud();
   render();
 }
 
-gameCards.forEach((card) => {
-  card.addEventListener("click", () => selectGame(card.dataset.game));
+window.addEventListener("keydown", (event) => {
+  if (state.running && state.mode === "sudoku" && /^[1-9]$/.test(event.key)) {
+    enterSudokuNumber(Number(event.key));
+    return;
+  }
+  if (state.running && state.mode === "sudoku" && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+    moveSudokuSelection(event.key);
+    return;
+  }
+  state.keys.add(event.key);
 });
+
+window.addEventListener("keyup", (event) => {
+  state.keys.delete(event.key);
+});
+
+canvas.addEventListener("pointermove", (event) => {
+  if (!state.running || state.mode === "targets" || state.mode === "sudoku") return;
+  const rect = canvas.getBoundingClientRect();
+  state.player.x = (event.clientX - rect.left) * (canvas.width / rect.width);
+});
+
+canvas.addEventListener("pointerdown", (event) => {
+  if (state.running && state.mode === "sudoku") {
+    selectSudokuCell(event);
+    return;
+  }
+  if (!state.running || state.mode !== "targets" || !state.target) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = (event.clientX - rect.left) * (canvas.width / rect.width);
+  const y = (event.clientY - rect.top) * (canvas.height / rect.height);
+  if (Math.hypot(x - state.target.x, y - state.target.y) <= state.target.radius) {
+    state.score += 1;
+    spawnTarget(performance.now());
+  }
+});
+
+gameCards.forEach((card) => card.addEventListener("click", () => selectGame(card.dataset.game)));
 
 sudokuDifficultySelect.addEventListener("change", () => {
   state.sudokuDifficulty = sudokuDifficultySelect.value;

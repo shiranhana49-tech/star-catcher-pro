@@ -4,10 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Shiranh Arcade | Professional Game Website</title>
-    <meta
-      name="description"
-      content="Shiranh Arcade is a professional browser game website developed by shiranh with multiple instant-play arcade games."
-    >
+    <meta name="description" content="Shiranh Arcade is a professional browser game website developed by shiranh with multiple instant-play games.">
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
@@ -49,23 +46,14 @@
         <button class="game-card" type="button" data-game="sudoku">
           <span>Game 04</span>
           <strong>Shiranh Sudoku Pro</strong>
-          <small>Fill the 9x9 grid using logic and numbers 1 to 9.</small>
+          <small>Fill the 9x9 grid with five difficulty levels.</small>
         </button>
       </section>
 
       <section class="hud" aria-label="Game stats">
-        <div>
-          <span class="label">Score</span>
-          <strong id="score">0</strong>
-        </div>
-        <div>
-          <span class="label">Best</span>
-          <strong id="best">0</strong>
-        </div>
-        <div>
-          <span class="label">Lives</span>
-          <strong id="lives">3</strong>
-        </div>
+        <div><span class="label">Score</span><strong id="score">0</strong></div>
+        <div><span class="label">Best</span><strong id="best">0</strong></div>
+        <div><span class="label">Lives</span><strong id="lives">3</strong></div>
       </section>
 
       <section class="difficulty-panel" id="sudokuDifficultyPanel" aria-label="Sudoku difficulty">
@@ -77,10 +65,10 @@
           <option value="expert">Expert</option>
           <option value="master">Master</option>
         </select>
-        <span id="difficultyHint">Easy starts with more numbers.</span>
+        <span id="difficultyHint">Easy starts with more numbers and 5 lives.</span>
       </section>
 
-      <canvas id="game" width="900" height="540" aria-label="Star Catcher game"></canvas>
+      <canvas id="game" width="900" height="540" aria-label="Selected Shiranh Arcade game"></canvas>
 
       <section class="controls">
         <button id="startButton" type="button">Start Game</button>
@@ -91,7 +79,7 @@
         <article>
           <span class="card-kicker">Library</span>
           <h2>Four games included</h2>
-          <p>Choose from action arcade games or the new Shiranh Sudoku Pro puzzle board.</p>
+          <p>Play three action arcade games plus Shiranh Sudoku Pro with five levels.</p>
         </article>
         <article>
           <span class="card-kicker">Play</span>
@@ -101,13 +89,11 @@
         <article>
           <span class="card-kicker">Creator</span>
           <h2>Developed by shiranh</h2>
-          <p>Original game concept, interface, and creator mark prepared for GitHub Pages publishing.</p>
+          <p>Original game concept, interface, and creator mark prepared for GitHub Pages.</p>
         </article>
       </section>
 
-      <footer class="signature">
-        Shiranh Arcade | Developed by shiranh | GitHub Pages ready
-      </footer>
+      <footer class="signature">Shiranh Arcade | Developed by shiranh | GitHub Pages ready</footer>
     </main>
 
     <script src="game.js"></script>
