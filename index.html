@@ -3,31 +3,50 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Star Catcher Pro | Developed by shiranh</title>
+    <title>Shiranh Arcade | Professional Game Website</title>
     <meta
       name="description"
-      content="Star Catcher Pro is a polished arcade browser game developed by shiranh. Catch stars, avoid rocks, and chase your best score."
+      content="Shiranh Arcade is a professional browser game website developed by shiranh with multiple instant-play arcade games."
     >
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <main class="game-shell">
       <nav class="site-nav" aria-label="Game navigation">
-        <a class="logo" href="#game">Star Catcher Pro</a>
+        <a class="logo" href="#game">Shiranh Arcade</a>
+        <a class="nav-link" href="#games">Games</a>
         <a class="nav-link" href="#about">About</a>
       </nav>
 
       <header class="brand-bar">
         <div>
           <p class="eyebrow">Arcade Edition</p>
-          <h1>Star Catcher Pro</h1>
-          <p class="intro">A fast, clean browser arcade game built for instant play on desktop and mobile.</p>
+          <h1>Shiranh Arcade</h1>
+          <p class="intro">A professional multi-game browser arcade built for instant play on desktop and mobile.</p>
         </div>
         <div class="creator-mark" aria-label="Developed by shiranh">
           <span>SHIRANH TM</span>
           <small>Developed by shiranh</small>
         </div>
       </header>
+
+      <section id="games" class="game-library" aria-label="Choose a game">
+        <button class="game-card active" type="button" data-game="stars">
+          <span>Game 01</span>
+          <strong>Star Catcher Pro</strong>
+          <small>Catch stars, dodge rocks, chase a high score.</small>
+        </button>
+        <button class="game-card" type="button" data-game="gems">
+          <span>Game 02</span>
+          <strong>Neon Gem Rush</strong>
+          <small>Grab glowing gems and avoid red sparks.</small>
+        </button>
+        <button class="game-card" type="button" data-game="targets">
+          <span>Game 03</span>
+          <strong>Pulse Target Pro</strong>
+          <small>Tap targets before the pulse runs out.</small>
+        </button>
+      </section>
 
       <section class="hud" aria-label="Game stats">
         <div>
@@ -48,19 +67,19 @@
 
       <section class="controls">
         <button id="startButton" type="button">Start Game</button>
-        <p>Move with arrow keys or A/D. On touch screens, drag the catcher.</p>
+        <p id="gameHelp">Move with arrow keys or A/D. On touch screens, drag the catcher.</p>
       </section>
 
       <section id="about" class="info-grid" aria-label="Game details">
         <article>
-          <span class="card-kicker">Goal</span>
-          <h2>Catch the stars</h2>
-          <p>Collect falling stars to raise your score. Every miss costs a life, so stay sharp.</p>
+          <span class="card-kicker">Library</span>
+          <h2>Three games included</h2>
+          <p>Choose Star Catcher Pro, Neon Gem Rush, or Pulse Target Pro from the game library.</p>
         </article>
         <article>
-          <span class="card-kicker">Danger</span>
-          <h2>Dodge the rocks</h2>
-          <p>Rocks get more common as the score grows. One hit removes a life.</p>
+          <span class="card-kicker">Play</span>
+          <h2>Instant browser arcade</h2>
+          <p>No install needed. Each game runs directly inside the website canvas.</p>
         </article>
         <article>
           <span class="card-kicker">Creator</span>
@@ -70,7 +89,7 @@
       </section>
 
       <footer class="signature">
-        Star Catcher Pro | Developed by shiranh | GitHub Pages ready
+        Shiranh Arcade | Developed by shiranh | GitHub Pages ready
       </footer>
     </main>
 

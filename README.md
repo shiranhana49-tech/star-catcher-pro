@@ -1,16 +1,22 @@
-# Star Catcher Pro
+# Shiranh Arcade
 
-Professional arcade browser game developed by shiranh.
+Professional multi-game browser arcade developed by shiranh.
 
-## Play
+## Games
 
-Catch falling stars, avoid rocks, and protect your three lives. The game works on desktop with arrow keys or A/D, and on touch screens by dragging the catcher.
+- Star Catcher Pro - catch stars, avoid rocks, and protect your lives.
+- Neon Gem Rush - collect glowing gems while dodging red sparks.
+- Pulse Target Pro - tap glowing targets before the pulse disappears.
+
+## Controls
+
+Star Catcher Pro and Neon Gem Rush work with arrow keys, A/D, or touch dragging. Pulse Target Pro works by clicking or tapping targets.
 
 ## Files
 
 - `index.html` - page structure and game layout
 - `style.css` - professional visual design
-- `game.js` - canvas game logic
+- `game.js` - multi-game canvas logic
 
 ## Publish on GitHub Pages
 

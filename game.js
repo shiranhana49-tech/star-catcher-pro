@@ -4,15 +4,50 @@ const scoreEl = document.querySelector("#score");
 const bestEl = document.querySelector("#best");
 const livesEl = document.querySelector("#lives");
 const startButton = document.querySelector("#startButton");
-const GAME_TITLE = "Star Catcher Pro";
+const gameHelp = document.querySelector("#gameHelp");
+const gameCards = [...document.querySelectorAll(".game-card")];
+
+const games = {
+  stars: {
+    title: "Star Catcher Pro",
+    help: "Move with arrow keys or A/D. On touch screens, drag the catcher.",
+    bestKey: "shiranh-arcade-stars-best",
+    good: "star",
+    bad: "rock",
+    playerColor: "#57d7ff",
+    goodColor: "#ffcf4a",
+    badColor: "#a0a8b8",
+    spawnBase: 900,
+    speedBase: 145,
+  },
+  gems: {
+    title: "Neon Gem Rush",
+    help: "Move with arrow keys or A/D. Catch cyan gems and avoid red sparks.",
+    bestKey: "shiranh-arcade-gems-best",
+    good: "gem",
+    bad: "spark",
+    playerColor: "#8effd2",
+    goodColor: "#4bf3ff",
+    badColor: "#ff5a7a",
+    spawnBase: 760,
+    speedBase: 175,
+  },
+  targets: {
+    title: "Pulse Target Pro",
+    help: "Click or tap each glowing target before the pulse disappears.",
+    bestKey: "shiranh-arcade-targets-best",
+  },
+};
 
 const state = {
+  mode: "stars",
   running: false,
   score: 0,
-  best: Number(localStorage.getItem("star-catcher-best") || 0),
+  best: 0,
   lives: 3,
   keys: new Set(),
   drops: [],
+  target: null,
   lastSpawn: 0,
   lastFrame: 0,
   player: {
@@ -24,18 +59,42 @@ const state = {
   },
 };
 
-bestEl.textContent = state.best;
+function activeGame() {
+  return games[state.mode];
+}
+
+function loadBest() {
+  state.best = Number(localStorage.getItem(activeGame().bestKey) || 0);
+  bestEl.textContent = state.best;
+}
+
+function selectGame(mode) {
+  state.mode = mode;
+  state.running = false;
+  state.score = 0;
+  state.lives = 3;
+  state.drops = [];
+  state.target = null;
+  startButton.textContent = "Start Game";
+  gameHelp.textContent = activeGame().help;
+  gameCards.forEach((card) => card.classList.toggle("active", card.dataset.game === mode));
+  loadBest();
+  syncHud();
+  render();
+}
 
 function resetGame() {
   state.running = true;
   state.score = 0;
   state.lives = 3;
   state.drops = [];
+  state.target = null;
   state.lastSpawn = 0;
   state.lastFrame = performance.now();
   state.player.x = canvas.width / 2;
   startButton.textContent = "Restart";
   syncHud();
+  if (state.mode === "targets") spawnTarget(performance.now());
   requestAnimationFrame(loop);
 }
 
@@ -45,20 +104,38 @@ function syncHud() {
   livesEl.textContent = state.lives;
 }
 
+function saveBest() {
+  if (state.score <= state.best) return;
+  state.best = state.score;
+  localStorage.setItem(activeGame().bestKey, String(state.best));
+}
+
 function spawnDrop(now) {
-  const spawnRate = Math.max(360, 920 - state.score * 11);
+  const game = activeGame();
+  const spawnRate = Math.max(320, game.spawnBase - state.score * 10);
   if (now - state.lastSpawn < spawnRate) return;
 
-  const isRock = Math.random() < Math.min(0.34, 0.14 + state.score / 280);
+  const isBad = Math.random() < Math.min(0.36, 0.14 + state.score / 260);
   state.drops.push({
     x: 30 + Math.random() * (canvas.width - 60),
     y: -30,
-    radius: isRock ? 18 : 15,
-    speed: 145 + Math.random() * 95 + state.score * 2.5,
-    kind: isRock ? "rock" : "star",
+    radius: isBad ? 18 : 15,
+    speed: game.speedBase + Math.random() * 95 + state.score * 2.5,
+    kind: isBad ? game.bad : game.good,
     spin: Math.random() * Math.PI,
   });
   state.lastSpawn = now;
+}
+
+function spawnTarget(now) {
+  const radius = Math.max(22, 42 - state.score * 0.35);
+  state.target = {
+    x: 70 + Math.random() * (canvas.width - 140),
+    y: 82 + Math.random() * (canvas.height - 165),
+    radius,
+    born: now,
+    ttl: Math.max(850, 1750 - state.score * 18),
+  };
 }
 
 function movePlayer(delta) {
@@ -72,6 +149,7 @@ function movePlayer(delta) {
 }
 
 function updateDrops(delta) {
+  const game = activeGame();
   const catcher = {
     left: state.player.x - state.player.width / 2,
     right: state.player.x + state.player.width / 2,
@@ -89,34 +167,47 @@ function updateDrops(delta) {
       drop.y + drop.radius > catcher.top &&
       drop.y - drop.radius < catcher.bottom;
 
-    if (caught && drop.kind === "star") {
+    if (caught && drop.kind === game.good) {
       state.score += 1;
       return false;
     }
 
-    if (caught && drop.kind === "rock") {
+    if (caught && drop.kind === game.bad) {
       state.lives -= 1;
       return false;
     }
 
     if (drop.y - drop.radius > canvas.height) {
-      if (drop.kind === "star") state.lives -= 1;
+      if (drop.kind === game.good) state.lives -= 1;
       return false;
     }
 
     return true;
   });
+}
 
-  if (state.score > state.best) {
-    state.best = state.score;
-    localStorage.setItem("star-catcher-best", String(state.best));
+function updateTargetGame(now) {
+  if (!state.target) spawnTarget(now);
+  if (state.target && now - state.target.born > state.target.ttl) {
+    state.lives -= 1;
+    spawnTarget(now);
+  }
+}
+
+function updateGame(delta, now) {
+  if (state.mode === "targets") {
+    updateTargetGame(now);
+  } else {
+    spawnDrop(now);
+    movePlayer(delta);
+    updateDrops(delta);
   }
 
+  saveBest();
   if (state.lives <= 0) {
     state.running = false;
     startButton.textContent = "Play Again";
   }
-
   syncHud();
 }
 
@@ -146,7 +237,7 @@ function drawBackground() {
 
 function drawPlayer() {
   const { x, y, width, height } = state.player;
-  ctx.fillStyle = "#57d7ff";
+  ctx.fillStyle = activeGame().playerColor;
   ctx.beginPath();
   ctx.roundRect(x - width / 2, y - height / 2, width, height, 12);
   ctx.fill();
@@ -161,7 +252,7 @@ function drawStar(drop) {
   ctx.save();
   ctx.translate(drop.x, drop.y);
   ctx.rotate(drop.spin);
-  ctx.fillStyle = "#ffcf4a";
+  ctx.fillStyle = activeGame().goodColor;
   ctx.beginPath();
   for (let i = 0; i < 10; i += 1) {
     const radius = i % 2 === 0 ? drop.radius : drop.radius * 0.45;
@@ -173,11 +264,26 @@ function drawStar(drop) {
   ctx.restore();
 }
 
+function drawGem(drop) {
+  ctx.save();
+  ctx.translate(drop.x, drop.y);
+  ctx.rotate(drop.spin);
+  ctx.fillStyle = activeGame().goodColor;
+  ctx.beginPath();
+  ctx.moveTo(0, -drop.radius);
+  ctx.lineTo(drop.radius, 0);
+  ctx.lineTo(0, drop.radius);
+  ctx.lineTo(-drop.radius, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawRock(drop) {
   ctx.save();
   ctx.translate(drop.x, drop.y);
   ctx.rotate(drop.spin * 0.5);
-  ctx.fillStyle = "#a0a8b8";
+  ctx.fillStyle = drop.kind === "spark" ? activeGame().badColor : "#a0a8b8";
   ctx.beginPath();
   ctx.moveTo(-16, -10);
   ctx.lineTo(2, -18);
@@ -193,8 +299,31 @@ function drawRock(drop) {
 function drawDrops() {
   state.drops.forEach((drop) => {
     if (drop.kind === "star") drawStar(drop);
+    else if (drop.kind === "gem") drawGem(drop);
     else drawRock(drop);
   });
+}
+
+function drawTarget(now) {
+  if (!state.target) return;
+  const progress = Math.max(0, 1 - (now - state.target.born) / state.target.ttl);
+  const pulse = state.target.radius + (1 - progress) * 28;
+
+  ctx.strokeStyle = `rgba(255, 207, 74, ${0.25 + progress * 0.45})`;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.arc(state.target.x, state.target.y, pulse, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.fillStyle = "#57d7ff";
+  ctx.beginPath();
+  ctx.arc(state.target.x, state.target.y, state.target.radius, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(state.target.x, state.target.y, state.target.radius * 0.42, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function drawMessage(title, detail) {
@@ -209,30 +338,32 @@ function drawMessage(title, detail) {
   ctx.fillText(detail, canvas.width / 2, canvas.height / 2 + 34);
 }
 
-function render() {
+function render(now = performance.now()) {
   drawBackground();
-  drawDrops();
-  drawPlayer();
+  if (state.mode === "targets") {
+    drawTarget(now);
+  } else {
+    drawDrops();
+    drawPlayer();
+  }
 
   if (!state.running) {
-    const title = state.score > 0 ? "Game Over" : GAME_TITLE;
-    const detail = state.score > 0 ? `Final score: ${state.score}` : "Catch stars. Dodge rocks.";
+    const title = state.score > 0 ? "Game Over" : activeGame().title;
+    const detail = state.score > 0 ? `Final score: ${state.score}` : activeGame().help;
     drawMessage(title, detail);
   }
 }
 
 function loop(now) {
   if (!state.running) {
-    render();
+    render(now);
     return;
   }
 
   const delta = Math.min(0.032, (now - state.lastFrame) / 1000);
   state.lastFrame = now;
-  spawnDrop(now);
-  movePlayer(delta);
-  updateDrops(delta);
-  render();
+  updateGame(delta, now);
+  render(now);
   requestAnimationFrame(loop);
 }
 
@@ -245,12 +376,30 @@ window.addEventListener("keyup", (event) => {
 });
 
 canvas.addEventListener("pointermove", (event) => {
-  if (!state.running) return;
+  if (!state.running || state.mode === "targets") return;
   const rect = canvas.getBoundingClientRect();
   const scale = canvas.width / rect.width;
   state.player.x = (event.clientX - rect.left) * scale;
 });
 
+canvas.addEventListener("pointerdown", (event) => {
+  if (!state.running || state.mode !== "targets" || !state.target) return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (event.clientX - rect.left) * scaleX;
+  const y = (event.clientY - rect.top) * scaleY;
+  const distance = Math.hypot(x - state.target.x, y - state.target.y);
+  if (distance <= state.target.radius) {
+    state.score += 1;
+    spawnTarget(performance.now());
+  }
+});
+
+gameCards.forEach((card) => {
+  card.addEventListener("click", () => selectGame(card.dataset.game));
+});
+
 startButton.addEventListener("click", resetGame);
 
-render();
+selectGame("stars");
