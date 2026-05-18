@@ -307,14 +307,6 @@ canvas.hidden {
   box-shadow: none;
 }
 
-.sudoku-cell.group-right {
-  border-right: 0;
-}
-
-.sudoku-cell.group-bottom {
-  border-bottom: 0;
-}
-
 .sudoku-cell.fixed {
   background: #111f35;
   color: #ffcf4a;

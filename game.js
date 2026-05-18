@@ -193,8 +193,6 @@ function renderSudokuBoard(wrongCell = null) {
       cell.type = "button";
       cell.className = "sudoku-cell";
       cell.textContent = state.sudokuBoard[row][col] || "";
-      if (col === 2 || col === 5) cell.classList.add("group-right");
-      if (row === 2 || row === 5) cell.classList.add("group-bottom");
       if (sudokuPuzzle[row][col] !== 0) cell.classList.add("fixed");
       if (state.sudokuSelected.row === row && state.sudokuSelected.col === col) cell.classList.add("selected");
       if (wrongCell && wrongCell.row === row && wrongCell.col === col) cell.classList.add("wrong");
