@@ -10,7 +10,7 @@
   <body>
     <main class="game-shell">
       <nav class="site-nav" aria-label="Game navigation">
-        <a class="logo" href="#game">Shiranh Arcade</a>
+        <a class="logo" href="#games">Shiranh Arcade</a>
         <a class="nav-link" href="#games">Games</a>
         <a class="nav-link" href="#about">About</a>
       </nav>
@@ -46,7 +46,7 @@
         <button class="game-card" type="button" data-game="sudoku">
           <span>Game 04</span>
           <strong>Shiranh Sudoku Pro</strong>
-          <small>Fill the 9x9 grid with five difficulty levels.</small>
+          <small>Big mobile Sudoku board with five difficulty levels.</small>
         </button>
       </section>
 
@@ -68,7 +68,26 @@
         <span id="difficultyHint">Easy starts with more numbers and 5 lives.</span>
       </section>
 
-      <canvas id="game" width="900" height="540" aria-label="Selected Shiranh Arcade game"></canvas>
+      <canvas id="game" width="900" height="540" aria-label="Selected arcade game"></canvas>
+
+      <section id="sudokuGame" class="sudoku-game" aria-label="Shiranh Sudoku Pro">
+        <div class="sudoku-title">
+          <h2>Shiranh Sudoku Pro</h2>
+          <p>Tap a square, then tap a number below.</p>
+        </div>
+        <div id="sudokuBoard" class="sudoku-board" aria-label="Sudoku board"></div>
+        <div class="sudoku-pad" id="sudokuNumberPad" aria-label="Sudoku number pad">
+          <button type="button" data-number="1">1</button>
+          <button type="button" data-number="2">2</button>
+          <button type="button" data-number="3">3</button>
+          <button type="button" data-number="4">4</button>
+          <button type="button" data-number="5">5</button>
+          <button type="button" data-number="6">6</button>
+          <button type="button" data-number="7">7</button>
+          <button type="button" data-number="8">8</button>
+          <button type="button" data-number="9">9</button>
+        </div>
+      </section>
 
       <section class="controls">
         <button id="startButton" type="button">Start Game</button>
@@ -79,12 +98,12 @@
         <article>
           <span class="card-kicker">Library</span>
           <h2>Four games included</h2>
-          <p>Play three action arcade games plus Shiranh Sudoku Pro with five levels.</p>
+          <p>Play three action arcade games plus a big mobile-friendly Sudoku puzzle.</p>
         </article>
         <article>
           <span class="card-kicker">Play</span>
           <h2>Instant browser arcade</h2>
-          <p>No install needed. Each game runs directly inside the website canvas.</p>
+          <p>No install needed. Each game runs directly inside the website.</p>
         </article>
         <article>
           <span class="card-kicker">Creator</span>

@@ -20,7 +20,7 @@ body {
 }
 
 .game-shell {
-  width: min(960px, 100%);
+  width: min(980px, 100%);
   margin: 0 auto;
 }
 
@@ -61,13 +61,24 @@ body {
   margin-bottom: 16px;
 }
 
-.eyebrow {
-  margin: 0 0 6px;
+.eyebrow,
+.label,
+.card-kicker,
+.game-card span,
+.difficulty-panel label {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eyebrow,
+.difficulty-panel label {
   color: #ffcf4a;
   font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
 }
 
 h1 {
@@ -98,8 +109,11 @@ h1 {
   font-weight: 900;
 }
 
-.creator-mark small {
-  color: #dce8f8;
+.creator-mark small,
+p,
+.game-card small,
+.difficulty-panel span {
+  color: #b7c5d8;
 }
 
 .game-library,
@@ -117,7 +131,8 @@ h1 {
 .game-card,
 .hud > div,
 .info-grid article,
-.difficulty-panel {
+.difficulty-panel,
+.sudoku-game {
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 8px;
   background: rgba(5, 11, 20, 0.7);
@@ -140,28 +155,21 @@ h1 {
 }
 
 .game-card span,
-.card-kicker {
-  color: #57d7ff;
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.game-card span,
 .game-card strong,
 .game-card small {
   display: block;
 }
 
+.game-card span,
+.card-kicker {
+  color: #57d7ff;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
 .game-card strong {
   margin: 8px 0;
   font-size: 1.05rem;
-}
-
-.game-card small,
-p {
-  color: #b7c5d8;
 }
 
 .hud {
@@ -179,8 +187,6 @@ p {
   margin-bottom: 4px;
   color: #9eb4d0;
   font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 strong {
@@ -196,14 +202,6 @@ strong {
 
 .difficulty-panel.visible {
   display: flex;
-}
-
-.difficulty-panel label {
-  color: #ffcf4a;
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
 
 .difficulty-panel select {
@@ -223,6 +221,117 @@ canvas {
   border-radius: 8px;
   background: #06101f;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+}
+
+canvas.hidden {
+  display: none;
+}
+
+.sudoku-game {
+  display: none;
+  width: min(100%, 620px);
+  margin: 0 auto;
+  padding: 16px;
+  border-color: rgba(255, 207, 74, 0.28);
+  background:
+    linear-gradient(135deg, rgba(255, 207, 74, 0.12), rgba(87, 215, 255, 0.07)),
+    rgba(5, 11, 20, 0.84);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+}
+
+.sudoku-game.visible {
+  display: block;
+}
+
+.sudoku-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sudoku-title h2 {
+  margin: 0;
+  color: #f7fbff;
+}
+
+.sudoku-title p {
+  margin: 0;
+}
+
+.sudoku-board {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  width: min(100%, 590px);
+  margin: 0 auto;
+  overflow: hidden;
+  border: 2px solid #ffcf4a;
+  border-radius: 8px;
+  background: #071426;
+  box-shadow: 0 0 0 1px rgba(87, 215, 255, 0.28), 0 18px 50px rgba(0, 0, 0, 0.26);
+}
+
+.sudoku-cell {
+  aspect-ratio: 1;
+  border: 1px solid rgba(87, 215, 255, 0.3);
+  background: #0b1728;
+  color: #f7fbff;
+  font-size: clamp(1.15rem, 6vw, 2.15rem);
+  font-weight: 500;
+  line-height: 1;
+  box-shadow: none;
+}
+
+.sudoku-cell.group-right {
+  border-right: 2px solid #ffcf4a;
+}
+
+.sudoku-cell.group-bottom {
+  border-bottom: 2px solid #ffcf4a;
+}
+
+.sudoku-cell.fixed {
+  background: #111f35;
+  color: #ffcf4a;
+}
+
+.sudoku-cell.selected {
+  background: #123a50;
+  color: #ffffff;
+  outline: 3px solid #57d7ff;
+  outline-offset: -4px;
+}
+
+.sudoku-cell.wrong {
+  background: #5c1826;
+  color: #ffffff;
+}
+
+.sudoku-pad {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.sudoku-pad button {
+  width: 48px;
+  min-height: 48px;
+  padding: 0;
+  border: 1px solid rgba(255, 207, 74, 0.36);
+  border-radius: 999px;
+  background: rgba(7, 20, 38, 0.88);
+  color: #ffcf4a;
+  font-size: 1.2rem;
+  box-shadow: none;
+}
+
+.sudoku-pad button:hover,
+.sudoku-pad button:focus-visible {
+  background: rgba(255, 207, 74, 0.16);
+  color: #ffffff;
 }
 
 .controls {
@@ -265,12 +374,13 @@ h2 {
 
 @media (max-width: 760px) {
   body {
-    padding: 14px;
+    padding: 10px;
   }
 
   .brand-bar,
   .controls,
-  .difficulty-panel {
+  .difficulty-panel,
+  .sudoku-title {
     align-items: stretch;
     flex-direction: column;
   }
@@ -283,6 +393,20 @@ h2 {
 
   .creator-mark {
     text-align: left;
+  }
+
+  .sudoku-game {
+    padding: 10px;
+  }
+
+  .sudoku-pad {
+    gap: 8px;
+  }
+
+  .sudoku-pad button {
+    width: 44px;
+    min-height: 44px;
+    font-size: 1.18rem;
   }
 
   button {
